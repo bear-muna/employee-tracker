@@ -1,6 +1,17 @@
-const Department = require('../classes/Department');
+class Role {
 
-class Role extends Department {
+    constructor(title, salary) {
+        this.title = title;
+        this.salary = salary;
+    }
+
+    viewAllRoles = () => {
+
+    }
+
+    addRole = () => {
+        
+    }
 
 }
 

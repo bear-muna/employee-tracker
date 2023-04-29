@@ -1,6 +1,24 @@
-const Role = require('../classes/Role');
+// How should foreign keys operate?
+// Should foreign keys be placed within the constructor?
 
-class Employee extends Role {
+class Employee {
+
+    constructor(firstName, lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    viewAllEmployee = () => {
+
+    }
+
+    addEmployee = () => {
+
+    }
+
+    updateEmployeeRole = () => {
+        
+    }
 
 }
 
