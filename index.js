@@ -16,7 +16,7 @@ const departments = [];
 const roles = [];
 const employees = [];
 
-const populateArray = () => {
+const populateDepArray = () => {
     db.query('SELECT name FROM department', (err, data) => {
         data.forEach(dep => { departments.push(dep.name) })
         console.log(departments);
@@ -49,6 +49,7 @@ const viewAllRolesPrompt = async () => {
                 name: 'choice'
             }
         ])
+    return choice;
 }
 
 const viewAllEmployeesPrompt = async () => {
@@ -60,6 +61,7 @@ const viewAllEmployeesPrompt = async () => {
                 name: 'choice'
             }
         ])
+    return choice;
 }
 
 const addDepartmentPrompt = async () => {
@@ -70,6 +72,7 @@ const addDepartmentPrompt = async () => {
                 name: 'choice'
             }
         ])
+    return choice;
 }
 
 const addRolePrompt = async () => {
@@ -91,6 +94,7 @@ const addRolePrompt = async () => {
                 name: 'salary'
             }
         ])
+    return choice;
 }
 
 const addEmployeePrompt = async () => {
@@ -117,6 +121,7 @@ const addEmployeePrompt = async () => {
                 name: 'role'
             }
         ])
+    return choice;
 }
 
 const updateEmployeeRolePrompt = async () => {
@@ -140,6 +145,7 @@ const updateEmployeeRolePrompt = async () => {
                 name: 'updateRole'
             }
         ])
+    return choice;
 }
 
 const viewAllDepartments = () => {
@@ -148,39 +154,60 @@ const viewAllDepartments = () => {
     })
 }
 
+// TODO: BUG trying to give 'id' a numeric value
 const viewAllRoles = (x) => {
     let dep = x.choice;
+    let id;
     if (x.choice == "All") {
-        dep = '*';
+        db.query('SELECT title, salary FROM role;', (err ,data) => {
+            console.log(data);
+        })
+        return;
     }
-    db.query('SELECT ? FROM role', [dep], (err ,data) => {
-        console.log(data);
-    })
+    //  else {
+    //     db.query('SELECT id FROM department WHERE name = ?;', [dep], (err, data) => {
+    //         return id = parseInt(data[0].id);
+    //     });
+    //     db.query('SELECT role.title, role.salary FROM role JOIN department ON role.department_id = department.id WHERE department.id = ?;', [id], (err, data) => {
+    //         console.log(data);
+    //         console.log("Return");
+    //     });
+    // }
 }
 
+// TODO: Create to specify which department
 const viewAllEmployees = (x) => {
     let dep = x.choice;
+    let id;
     if (x.choice == "All") {
-        dep = '*';
+        db.query('SELECT employee.first_name, employee.last_name, role.title FROM employee JOIN role ON employee.role_id = role.id;', (err ,data) => {
+            console.log(data);
+        })
+        return;
     }
-    db.query('SELECT ? FROM employee', [dep], (err ,data) => {
+}
+
+// TODO: Need to make tables look good
+const addDepartment = (x) => {
+    let dep = x.choice;
+    console.log(x);
+    db.query('INSERT INTO department(name) VALUES(?);', [dep], (err, data) => {
+        console.log(data);
+    });
+    db.query('SELECT * FROM department;', (err, data) => {
         console.log(data);
     })
 }
 
-const addDepartment = () => {
+const addRole = (x) => {
 
 }
 
-const addRole = () => {
+const addEmployee = (x) => {
 
 }
 
-const addEmployee = () => {
-
-}
-
-const updateEmployeeRole = () => {
+const updateEmployeeRole = (x) => {
 
 }
 
@@ -227,10 +254,9 @@ const SwitchCase = async (c) => {
 };
 
 const runApp = async () => {
-    populateArray();
+    populateDepArray();
     const choice = await initialPrompt();
     const switchCheck = await SwitchCase(choice);
-    runApp();    
 };
 
 runApp();
