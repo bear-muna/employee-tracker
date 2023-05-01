@@ -1,15 +1,9 @@
-// const mysql = require('mysql2');
 const inquirer = require('inquirer');
 
-// const db = mysql.createConnection(
-//     {
-//         host: 'localhost',
-//         user: 'root',
-//         password: 'password',
-//         database: 'work_db'
-//     },
-//     console.log("Connected to db")
-// );
+// Need a function that will populate the array from the database and pass it along 
+const departments = [];
+const roles = [];
+const employees = [];
 
 // Starter Prompt
 const RunApp = async () => {
@@ -25,41 +19,119 @@ const RunApp = async () => {
     console.log(choice);
 };
 
-const SwitchCase = (c) => {
-    switch (c.choice.toUpperCase()) {
+const viewAllDepartmentsPrompt = () => {
 
-        case 'VIEW ALL DEPARTMENTS':
-            viewAllDepartments();
-            break;
+}
 
-        case 'VIEW ALL ROLES':
-            viewAllRoles();
-            break;
+const viewAllRolesPrompt = async () => {
+    const choice = await inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: 'Choose which department',
+                choices: [...departments, 'All'],
+                name: 'choice'
+            }
+        ])
+}
 
-        case 'VIEW ALL EMPLOYEES':
-            viewAllEmployees();
-            break;
+const viewAllEmployeesPrompt = async () => {
+    const choice = await inquirer 
+        .prompt([
+            {
+                type: 'list',
+                message: 'Choose which department',
+                choices: [...departments, 'All'],
+                name: 'choice'
+            }
+        ])
+}
 
-        case 'ADD A DEPARTMENT':
-            addDepartment();
-            break;
+const addDepartmentPrompt = async () => {
+    const choice = await inquirer
+        .prompt([
+            {
+                type: 'input',
+                message: 'What department would you like to add?',
+                name: 'choice'
+            }
+        ])
+}
 
-        case 'ADD A ROLE':
-            addRole();
-            break;
+const addRolePrompt = async () => {
+    const choice = await inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: 'What department would you like to add a role to?',
+                choices: [...departments],
+                name: 'department'
+            },
+            {
+                type: 'input',
+                message: 'What is the title of the role?',
+                name: 'title'
+            },
+            {
+                type: 'input',
+                message: 'What is the salary of the role?',
+                name: 'salary'
+            }
+        ])
+}
 
-        case 'ADD AN EMPLOYEE':
-            addEmployee();
-            break;
+const addEmployeePrompt = async () => {
+    const choice = await inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: 'What department would you like to add an employee to?',
+                choices: [...departments],
+                name: 'department'
+            },
+            {
+                type: 'input',
+                message: "What is the employee's first name?",
+                name: 'firstName'
+            },
+            {
+                type: 'input',
+                message: "What is the employee's last name?",
+                name: 'lastName'
+            },
+            {
+                type: 'input',
+                message: "What is the employee's role?",
+                name: 'role'
+            }
+        ])
+}
 
-        case 'UPDATE EMPLOYEE ROLE':
-            updateEmployeeRole();
-            break;
+const updateEmployeeRolePrompt = async () => {
+    const choice = await inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: "What department is the employee in?",
+                choices: [...departments],
+                name: 'department'
+            },
+            {
+                type: 'list',
+                message: "Choose the employee",
+                choices: [...employees],
+                name: 'employee'
+            },
+            {
+                type: 'list',
+                message: "Choose what role to update to",
+                choices: [...roles],
+                name: 'updateRole'
+            }
+        ])
+}
 
-        case 'QUIT':
-            break;
-    }
-};
+
 // View all departments
 
 // View all roles
