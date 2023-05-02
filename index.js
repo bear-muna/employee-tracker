@@ -154,8 +154,6 @@ const viewAllDepartments = () => {
     })
 }
 
-// TODO: BUG trying to give 'id' a numeric value
-// TODO: Unable to view new roles that were created
 const viewAllRoles = (x) => {
     let id;
     if (x.choice == "All") {
@@ -175,13 +173,19 @@ const viewAllRoles = (x) => {
 
 // TODO: Create to specify which department
 const viewAllEmployees = (x) => {
-    let dep = x.choice;
     let id;
+    console.log(x);
     if (x.choice == "All") {
-        db.query('SELECT employee.first_name, employee.last_name, role.title FROM employee JOIN role ON employee.role_id = role.id;', (err ,data) => {
+        db.query('SELECT employee.first_name, employee.last_name, role.title, department.name FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id;', (err ,data) => {
             console.log(data);
         })
-        return;
+    } else {
+        db.query('SELECT id FROM department WHERE name = ?;', [x.choice], (err, data) => {
+            id = data[0].id;
+            db.query('SELECT employee.first_name, employee.last_name, role.title, department.name FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id WHERE department.id = ?;', [id], (err, data) => {
+                console.log(data);
+            })
+        })
     }
 }
 
