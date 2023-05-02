@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+const cTable = require('console.table');
 let check = false;
 
 const db = mysql.createConnection(
@@ -37,7 +38,7 @@ const initialPrompt = async () => {
                 {
                     type: 'list',
                     message: 'What would you like to do?',
-                    choices: ["View all departments", "View all roles", "View all employees", "Add a department", "Add a role", "Add an employee", "Update employee role", "Quit"],
+                    choices: ["View all departments", "View all roles", "View all employees", "Add a department", "Add a role", "Add an employee", "Update employee role", "Update employee managers","Quit"],
                     name: 'choice'
                 }
             ]);
@@ -162,9 +163,10 @@ const updateEmployeeRolePrompt = async () => {
     }
 }
 
+
 const viewAllDepartments = () => {
     db.query('SELECT * FROM department;', (err, data) => {
-        console.log(data);
+        console.table('\nAll Departments', data);
     })
 }
 
@@ -172,14 +174,14 @@ const viewAllRoles = (x) => {
     let id;
     if (x.choice == "All") {
         db.query('SELECT role.title, role.salary, department.name FROM role JOIN department ON role.department_id = department.id;', (err ,data) => {
-            console.log(data);
+            console.table('\nAll Roles',data);
         })
     }
      else {
         db.query('SELECT id FROM department WHERE name = ?;', [x.choice], (err, data) => {
             id = data[0].id;
             db.query('SELECT role.title, role.salary, department.name FROM role JOIN department ON role.department_id = department.id WHERE department.id = ?;', [id], (err, data) => {
-                console.log(data);
+                console.table(`\nRoles from ${x.choice}`, data);
             });
         });
     }
@@ -190,13 +192,13 @@ const viewAllEmployees = (x) => {
     console.log(x);
     if (x.choice == "All") {
         db.query('SELECT employee.first_name, employee.last_name, role.title, department.name FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id;', (err ,data) => {
-            console.log(data);
+            console.table(`\nAll Employees`, data);
         })
     } else {
         db.query('SELECT id FROM department WHERE name = ?;', [x.choice], (err, data) => {
             id = data[0].id;
             db.query('SELECT employee.first_name, employee.last_name, role.title, department.name FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id WHERE department.id = ?;', [id], (err, data) => {
-                console.log(data);
+                console.table(`\nEmployees from ${x.choice}`, data);
             })
         })
     }
@@ -206,7 +208,7 @@ const addDepartment = (x) => {
     db.query('INSERT INTO department(name) VALUES(?);', [x.choice], (err, data) => {
     });
     db.query('SELECT * FROM department;', (err, data) => {
-        console.log(data);
+        console.table(`\nAll Departments`, data);
     });
     populateArray();
 }
@@ -219,7 +221,7 @@ const addRole = (x) => {
             console.log("Successfully created a new role!");
         });
         db.query('SELECT role.title, role.salary, department.name FROM role JOIN department ON role.department_id = department.id WHERE department.id =?;', [depID], (err, data) => {
-            console.log(data);
+            console.table(`\nRoles from ${x.department}`, data);
         })
         populateArray();
     });
@@ -298,10 +300,11 @@ const runApp = async () => {
         populateArray();
         const choice = await initialPrompt();
         const switchCheck = await SwitchCase(choice);
-        if (!switchCheck) {
+        if (switchCheck) {
+            process.exit(0);
+        } else {
             runApp();
-        }  
-        process.exit(0);
+        }
     } catch (err) {
         console.log(err);
     }
