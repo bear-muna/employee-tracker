@@ -12,7 +12,6 @@ const db = mysql.createConnection(
     console.log("Connected to db")
 );
 
-// Need a function that will populate the array from the database and pass it along 
 const departments = [];
 const roles = [];
 const employees = [];
@@ -20,7 +19,6 @@ const employees = [];
 const populateArray = () => {
     db.query('SELECT name FROM department', (err, data) => {
         data.forEach(dep => { departments.push(dep.name) })
-        console.log(departments);
         return departments;
     });
     db.query('SELECT employee.first_name, employee.last_name FROM employee;', (err, data) => {
@@ -34,35 +32,40 @@ const populateArray = () => {
 }
 
 const initialPrompt = async () => {
-    const choice = await inquirer.prompt([
-            {
-                type: 'list',
-                message: 'What would you like to do?',
-                choices: ["View all departments", "View all roles", "View all employees", "Add a department", "Add a role", "Add an employee", "Update employee role", "Quit"],
-                name: 'choice'
-            }
-        ]);
-    return choice;
+    try {
+        const choice = await inquirer.prompt([
+                {
+                    type: 'list',
+                    message: 'What would you like to do?',
+                    choices: ["View all departments", "View all roles", "View all employees", "Add a department", "Add a role", "Add an employee", "Update employee role", "Quit"],
+                    name: 'choice'
+                }
+            ]);
+        return choice;     
+    } catch (error) {
+        console.log(error);
+    }
 };
-    
-const viewAllDepartmentsPrompt = () => {
-
-}
 
 const viewAllRolesPrompt = async () => {
-    const choice = await inquirer.prompt([
-            {
-                type: 'list',
-                message: 'Choose which department',
-                choices: [...departments, 'All'],
-                name: 'choice'
-            }
-        ])
-    return choice;
+    try {
+        const choice = await inquirer.prompt([
+                {
+                    type: 'list',
+                    message: 'Choose which department',
+                    choices: [...departments, 'All'],
+                    name: 'choice'
+                }
+            ])
+        return choice;
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 const viewAllEmployeesPrompt = async () => {
-    const choice = await inquirer.prompt([
+    try {
+        const choice = await inquirer.prompt([
             {
                 type: 'list',
                 message: 'Choose which department',
@@ -70,22 +73,30 @@ const viewAllEmployeesPrompt = async () => {
                 name: 'choice'
             }
         ])
-    return choice;
+        return choice;
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 const addDepartmentPrompt = async () => {
-    const choice = await inquirer.prompt([
+    try {
+        const choice = await inquirer.prompt([
             {
                 type: 'input',
                 message: 'What department would you like to add?',
                 name: 'choice'
             }
         ])
-    return choice;
+        return choice;
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 const addRolePrompt = async () => {
-    const choice = await inquirer.prompt([
+    try {
+        const choice = await inquirer.prompt([
             {
                 type: 'list',
                 message: 'What department would you like to add a role to?',
@@ -103,11 +114,15 @@ const addRolePrompt = async () => {
                 name: 'salary'
             }
         ])
-    return choice;
+        return choice;
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 const addEmployeePrompt = async () => {
-    const choice = await inquirer.prompt([
+    try {
+        const choice = await inquirer.prompt([
             {
                 type: 'input',
                 message: "What is the employee's first name?",
@@ -119,11 +134,15 @@ const addEmployeePrompt = async () => {
                 name: 'lastName'
             }
         ])
-    return choice;
+        return choice;
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 const updateEmployeeRolePrompt = async () => {
-    const choice = await inquirer.prompt([
+    try {
+        const choice = await inquirer.prompt([
             {
                 type: 'list',
                 message: "Choose the employee",
@@ -137,7 +156,10 @@ const updateEmployeeRolePrompt = async () => {
                 name: 'updateRole'
             }
         ])
-    return choice;
+        return choice;
+    } catch (error) {
+        console.log(error);   
+    }
 }
 
 const viewAllDepartments = () => {
@@ -182,7 +204,6 @@ const viewAllEmployees = (x) => {
 
 const addDepartment = (x) => {
     db.query('INSERT INTO department(name) VALUES(?);', [x.choice], (err, data) => {
-        console.log(data);
     });
     db.query('SELECT * FROM department;', (err, data) => {
         console.log(data);
@@ -226,45 +247,49 @@ const updateEmployeeRole = (x) => {
 }
 
 const SwitchCase = async (c) => {
-    switch (c.choice.toUpperCase()) {
-
-        case 'VIEW ALL DEPARTMENTS':
-            viewAllDepartments();
-            break;
-
-        case 'VIEW ALL ROLES':
-            const a = await viewAllRolesPrompt();
-            viewAllRoles(a);
-            break;
-
-        case 'VIEW ALL EMPLOYEES':
-            const b = await viewAllEmployeesPrompt();
-            viewAllEmployees(b);
-            break;
-
-        case 'ADD A DEPARTMENT':
-            const c = await addDepartmentPrompt();
-            addDepartment(c);
-            break;
-
-        case 'ADD A ROLE':
-            const d = await addRolePrompt();
-            addRole(d);
-            break;
-
-        case 'ADD AN EMPLOYEE':
-            const e = await addEmployeePrompt();
-            addEmployee(e);
-            break;
-
-        case 'UPDATE EMPLOYEE ROLE':
-            const f = await updateEmployeeRolePrompt();
-            updateEmployeeRole(f);
-            break;
-
-        case 'QUIT':
-            check = true;
-            return check;
+    try {
+        switch (c.choice.toUpperCase()) {
+    
+            case 'VIEW ALL DEPARTMENTS':
+                viewAllDepartments();
+                break;
+    
+            case 'VIEW ALL ROLES':
+                const a = await viewAllRolesPrompt();
+                viewAllRoles(a);
+                break;
+    
+            case 'VIEW ALL EMPLOYEES':
+                const b = await viewAllEmployeesPrompt();
+                viewAllEmployees(b);
+                break;
+    
+            case 'ADD A DEPARTMENT':
+                const c = await addDepartmentPrompt();
+                addDepartment(c);
+                break;
+    
+            case 'ADD A ROLE':
+                const d = await addRolePrompt();
+                addRole(d);
+                break;
+    
+            case 'ADD AN EMPLOYEE':
+                const e = await addEmployeePrompt();
+                addEmployee(e);
+                break;
+    
+            case 'UPDATE EMPLOYEE ROLE':
+                const f = await updateEmployeeRolePrompt();
+                updateEmployeeRole(f);
+                break;
+    
+            case 'QUIT':
+                check = true;
+                return check;
+        }
+    } catch (error) {
+        console.log(error);
     }
 };
 
