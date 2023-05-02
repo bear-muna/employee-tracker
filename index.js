@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+let check = false;
 
 const db = mysql.createConnection(
     {
@@ -108,12 +109,6 @@ const addRolePrompt = async () => {
 const addEmployeePrompt = async () => {
     const choice = await inquirer.prompt([
             {
-                type: 'list',
-                message: 'What department would you like to add an employee to?',
-                choices: [...departments],
-                name: 'department'
-            },
-            {
                 type: 'input',
                 message: "What is the employee's first name?",
                 name: 'firstName'
@@ -192,6 +187,7 @@ const addDepartment = (x) => {
     db.query('SELECT * FROM department;', (err, data) => {
         console.log(data);
     });
+    populateArray();
 }
 
 const addRole = (x) => {
@@ -204,18 +200,15 @@ const addRole = (x) => {
         db.query('SELECT role.title, role.salary, department.name FROM role JOIN department ON role.department_id = department.id WHERE department.id =?;', [depID], (err, data) => {
             console.log(data);
         })
+        populateArray();
     });
 }
 
 const addEmployee = (x) => {
-    console.log(x);
-    let id;
-    db.query('SELECT id FROM department WHERE name = ?;', [x.department], (err, data) => {
-        id = data[0].id;
-        db.query('INSERT INTO employee (first_name, last_name) VALUES (?, ?);', [x.firstName, x.lastName], (err, data) => {
-            console.log("Successfully added an employee!");
-        });
-    })
+    db.query('INSERT INTO employee (first_name, last_name) VALUES (?, ?);', [x.firstName, x.lastName], (err, data) => {
+        console.log("Successfully added an employee!");
+        populateArray();
+    });
 }
 
 const updateEmployeeRole = (x) => {
@@ -228,6 +221,7 @@ const updateEmployeeRole = (x) => {
         db.query('UPDATE employee SET role_id = ? WHERE first_name = ? AND last_name = ?;', [id, firstName, lastName], (err, data) => {
             console.log("Successful updated employee's role!");
         })
+        populateArray();
     })
 }
 
@@ -269,14 +263,22 @@ const SwitchCase = async (c) => {
             break;
 
         case 'QUIT':
-            break;
+            check = true;
+            return check;
     }
 };
 
 const runApp = async () => {
-    populateArray();
-    const choice = await initialPrompt();
-    const switchCheck = await SwitchCase(choice);
+    try {
+        populateArray();
+        const choice = await initialPrompt();
+        const switchCheck = await SwitchCase(choice);
+        if (!switchCheck) {
+            runApp();
+        }  
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 runApp();
