@@ -16,12 +16,20 @@ const departments = [];
 const roles = [];
 const employees = [];
 
-const populateDepArray = () => {
+const populateArray = () => {
     db.query('SELECT name FROM department', (err, data) => {
         data.forEach(dep => { departments.push(dep.name) })
         console.log(departments);
         return departments;
     });
+    db.query('SELECT employee.first_name, employee.last_name FROM employee;', (err, data) => {
+        data.forEach(emp => { employees.push(`${emp.first_name} ${emp.last_name}`) });
+        return employees;
+    });
+    db.query('SELECT title FROM role;', (err, data) => {
+        data.forEach(role => { roles.push(role.title) });
+        return roles;
+    })
 }
 
 const initialPrompt = async () => {
@@ -123,12 +131,6 @@ const updateEmployeeRolePrompt = async () => {
     const choice = await inquirer.prompt([
             {
                 type: 'list',
-                message: "What department is the employee in?",
-                choices: [...departments],
-                name: 'department'
-            },
-            {
-                type: 'list',
                 message: "Choose the employee",
                 choices: [...employees],
                 name: 'employee'
@@ -217,7 +219,16 @@ const addEmployee = (x) => {
 }
 
 const updateEmployeeRole = (x) => {
-
+    let id;
+    let nameArray = x.employee.split(" ");
+    let firstName = nameArray[0];
+    let lastName = nameArray[1];
+    db.query('SELECT id FROM role where title = ?;', [x.updateRole], (err, data) => {
+        id = data[0].id;
+        db.query('UPDATE employee SET role_id = ? WHERE first_name = ? AND last_name = ?;', [id, firstName, lastName], (err, data) => {
+            console.log("Successful updated employee's role!");
+        })
+    })
 }
 
 const SwitchCase = async (c) => {
@@ -263,7 +274,7 @@ const SwitchCase = async (c) => {
 };
 
 const runApp = async () => {
-    populateDepArray();
+    populateArray();
     const choice = await initialPrompt();
     const switchCheck = await SwitchCase(choice);
 };
