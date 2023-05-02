@@ -155,14 +155,13 @@ const viewAllDepartments = () => {
 }
 
 // TODO: BUG trying to give 'id' a numeric value
+// TODO: Unable to view new roles that were created
 const viewAllRoles = (x) => {
-    let dep = x.choice;
     let id;
     if (x.choice == "All") {
-        db.query('SELECT title, salary FROM role;', (err ,data) => {
+        db.query('SELECT role.title, role.salary, department.name FROM role JOIN department ON role.department_id = department.id;', (err ,data) => {
             console.log(data);
         })
-        return;
     }
     //  else {
     //     db.query('SELECT id FROM department WHERE name = ?;', [dep], (err, data) => {
@@ -199,12 +198,27 @@ const addDepartment = (x) => {
     })
 }
 
+// TODO: Add specificity to add role function
+// Unable to show all roles that were just added
+// Role has no department_id
+// FIXED ! Only needed to nest the query
 const addRole = (x) => {
-
+    let depID;
+    console.log(x);
+    db.query('SELECT id FROM department WHERE name = ?;', [x.department], (err, data) => {
+        depID = data[0].id;
+        db.query('INSERT INTO role(title, salary, department_id) VALUES(?, ?, ?);', [x.title, x.salary, depID], (err, data) => {
+            console.log(depID);
+            console.log("Successfully created a new role!");
+        });
+        db.query('SELECT title, salary FROM role;', (err, data) => {
+            console.log(data);
+        })
+    });
 }
 
 const addEmployee = (x) => {
-
+ 
 }
 
 const updateEmployeeRole = (x) => {
