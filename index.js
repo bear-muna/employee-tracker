@@ -163,15 +163,14 @@ const viewAllRoles = (x) => {
             console.log(data);
         })
     }
-    //  else {
-    //     db.query('SELECT id FROM department WHERE name = ?;', [dep], (err, data) => {
-    //         return id = parseInt(data[0].id);
-    //     });
-    //     db.query('SELECT role.title, role.salary FROM role JOIN department ON role.department_id = department.id WHERE department.id = ?;', [id], (err, data) => {
-    //         console.log(data);
-    //         console.log("Return");
-    //     });
-    // }
+     else {
+        db.query('SELECT id FROM department WHERE name = ?;', [x.choice], (err, data) => {
+            id = data[0].id;
+            db.query('SELECT role.title, role.salary, department.name FROM role JOIN department ON role.department_id = department.id WHERE department.id = ?;', [id], (err, data) => {
+                console.log(data);
+            });
+        });
+    }
 }
 
 // TODO: Create to specify which department
