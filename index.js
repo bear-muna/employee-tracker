@@ -204,14 +204,12 @@ const addDepartment = (x) => {
 // FIXED ! Only needed to nest the query
 const addRole = (x) => {
     let depID;
-    console.log(x);
     db.query('SELECT id FROM department WHERE name = ?;', [x.department], (err, data) => {
         depID = data[0].id;
         db.query('INSERT INTO role(title, salary, department_id) VALUES(?, ?, ?);', [x.title, x.salary, depID], (err, data) => {
-            console.log(depID);
             console.log("Successfully created a new role!");
         });
-        db.query('SELECT title, salary FROM role;', (err, data) => {
+        db.query('SELECT role.title, role.salary, department.name FROM role JOIN department ON role.department_id = department.id WHERE department.id =?;', [depID], (err, data) => {
             console.log(data);
         })
     });
