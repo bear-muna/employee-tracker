@@ -301,6 +301,7 @@ const runApp = async () => {
         if (!switchCheck) {
             runApp();
         }  
+        process.exit(0);
     } catch (err) {
         console.log(err);
     }
