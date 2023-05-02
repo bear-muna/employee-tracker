@@ -114,11 +114,6 @@ const addEmployeePrompt = async () => {
                 type: 'input',
                 message: "What is the employee's last name?",
                 name: 'lastName'
-            },
-            {
-                type: 'input',
-                message: "What is the employee's role?",
-                name: 'role'
             }
         ])
     return choice;
@@ -171,7 +166,6 @@ const viewAllRoles = (x) => {
     }
 }
 
-// TODO: Create to specify which department
 const viewAllEmployees = (x) => {
     let id;
     console.log(x);
@@ -189,22 +183,15 @@ const viewAllEmployees = (x) => {
     }
 }
 
-// TODO: Need to make tables look good
 const addDepartment = (x) => {
-    let dep = x.choice;
-    console.log(x);
-    db.query('INSERT INTO department(name) VALUES(?);', [dep], (err, data) => {
+    db.query('INSERT INTO department(name) VALUES(?);', [x.choice], (err, data) => {
         console.log(data);
     });
     db.query('SELECT * FROM department;', (err, data) => {
         console.log(data);
-    })
+    });
 }
 
-// TODO: Add specificity to add role function
-// Unable to show all roles that were just added
-// Role has no department_id
-// FIXED ! Only needed to nest the query
 const addRole = (x) => {
     let depID;
     db.query('SELECT id FROM department WHERE name = ?;', [x.department], (err, data) => {
@@ -219,7 +206,14 @@ const addRole = (x) => {
 }
 
 const addEmployee = (x) => {
- 
+    console.log(x);
+    let id;
+    db.query('SELECT id FROM department WHERE name = ?;', [x.department], (err, data) => {
+        id = data[0].id;
+        db.query('INSERT INTO employee (first_name, last_name) VALUES (?, ?);', [x.firstName, x.lastName], (err, data) => {
+            console.log("Successfully added an employee!");
+        });
+    })
 }
 
 const updateEmployeeRole = (x) => {
