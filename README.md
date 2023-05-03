@@ -12,7 +12,7 @@ This application requires several steps before you can actually use it. After in
 You will be given several options once you start the program, such as viewing departments, roles, employees, and adding employees. Input the necessary values into the terminal and the database should create/read/update/delete depending on your choice. Once you are done using the application, select 'Quit'.
 
 ## Screen Recording
-
+![Demonstration of Application](./screenrecording/Untitled_%20May%202%2C%202023%2010_43%20PM.gif)
 
 ## Links
 GitHub Repository: https://github.com/bear-muna/employee-tracker
