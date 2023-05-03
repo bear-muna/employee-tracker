@@ -1,8 +1,9 @@
+// Importing variables from npm packages
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-let check = false;
 
+// Connecting to database 
 const db = mysql.createConnection(
     {
         host: 'localhost',
@@ -11,12 +12,15 @@ const db = mysql.createConnection(
         database: 'work_db'
     },
     console.log("Connected to db")
-);
-
+    );
+    
+// Variables for functions
+let check = false;
 const departments = [];
 const roles = [];
 const employees = [];
 
+// Function to populate arrays with seed values
 const populateArray = () => {
     db.query('SELECT name FROM department', (err, data) => {
         data.forEach(dep => { departments.push(dep.name) })
@@ -32,6 +36,7 @@ const populateArray = () => {
     })
 }
 
+// Main Menu Prompt
 const initialPrompt = async () => {
     try {
         const choice = await inquirer.prompt([
@@ -48,6 +53,7 @@ const initialPrompt = async () => {
     }
 };
 
+// Prompt to view roles from given or all departments
 const viewAllRolesPrompt = async () => {
     try {
         const choice = await inquirer.prompt([
@@ -64,6 +70,7 @@ const viewAllRolesPrompt = async () => {
     }
 }
 
+// Prompt to view employees from given or all departments
 const viewAllEmployeesPrompt = async () => {
     try {
         const choice = await inquirer.prompt([
@@ -80,6 +87,7 @@ const viewAllEmployeesPrompt = async () => {
     }
 }
 
+// Prompt used to add department into database
 const addDepartmentPrompt = async () => {
     try {
         const choice = await inquirer.prompt([
@@ -95,6 +103,7 @@ const addDepartmentPrompt = async () => {
     }
 }
 
+// Prompt to add a role within a department
 const addRolePrompt = async () => {
     try {
         const choice = await inquirer.prompt([
@@ -121,6 +130,7 @@ const addRolePrompt = async () => {
     }
 }
 
+// Prompt to add an employee
 const addEmployeePrompt = async () => {
     try {
         const choice = await inquirer.prompt([
@@ -141,6 +151,7 @@ const addEmployeePrompt = async () => {
     }
 }
 
+// Prompt to give an employee a role
 const updateEmployeeRolePrompt = async () => {
     try {
         const choice = await inquirer.prompt([
@@ -163,13 +174,14 @@ const updateEmployeeRolePrompt = async () => {
     }
 }
 
-
+// Function taking mySQL database and viewing department(s)
 const viewAllDepartments = () => {
     db.query('SELECT * FROM department;', (err, data) => {
         console.table('\nAll Departments', data);
     })
 }
 
+// Function to view role of given department(s)
 const viewAllRoles = (x) => {
     let id;
     if (x.choice == "All") {
@@ -187,6 +199,7 @@ const viewAllRoles = (x) => {
     }
 }
 
+// Function to view employees of department(s)
 const viewAllEmployees = (x) => {
     let id;
     console.log(x);
@@ -204,15 +217,19 @@ const viewAllEmployees = (x) => {
     }
 }
 
+// Function to add department
 const addDepartment = (x) => {
     db.query('INSERT INTO department(name) VALUES(?);', [x.choice], (err, data) => {
     });
     db.query('SELECT * FROM department;', (err, data) => {
         console.table(`\nAll Departments`, data);
     });
+    
+    // Must update departments array
     populateArray();
 }
 
+// Function to add a role into a department
 const addRole = (x) => {
     let depID;
     db.query('SELECT id FROM department WHERE name = ?;', [x.department], (err, data) => {
@@ -227,6 +244,7 @@ const addRole = (x) => {
     });
 }
 
+// Function to add an employee
 const addEmployee = (x) => {
     db.query('INSERT INTO employee (first_name, last_name) VALUES (?, ?);', [x.firstName, x.lastName], (err, data) => {
         console.log("Successfully added an employee!");
@@ -234,6 +252,7 @@ const addEmployee = (x) => {
     });
 }
 
+// Function to update employee role
 const updateEmployeeRole = (x) => {
     let id;
     let nameArray = x.employee.split(" ");
@@ -248,6 +267,7 @@ const updateEmployeeRole = (x) => {
     })
 }
 
+// Switch case to handle answer from main menu
 const SwitchCase = async (c) => {
     try {
         switch (c.choice.toUpperCase()) {
@@ -295,6 +315,8 @@ const SwitchCase = async (c) => {
     }
 };
 
+// Main function to handle async functions
+// Recursive function
 const runApp = async () => {
     try {
         populateArray();
