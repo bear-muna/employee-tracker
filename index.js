@@ -204,7 +204,7 @@ const viewAllEmployees = (x) => {
     let id;
     console.log(x);
     if (x.choice == "All") {
-        db.query('SELECT employee.first_name, employee.last_name, role.title, department.name FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id;', (err ,data) => {
+        db.query('SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, role.title, department.name FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id;', (err ,data) => {
             console.table(`\nAll Employees`, data);
         })
     } else {
@@ -267,6 +267,59 @@ const updateEmployeeRole = (x) => {
     })
 }
 
+// Prompt to update employees to have a manager
+const updateEmployeeManagersPrompt = async () => {
+    try {
+       const choice = await inquirer.prompt([
+        {
+            type: 'list',
+            message: 'Select an employee you wish you update',
+            choices: [...employees],
+            name: 'employee'
+        }
+        ]);
+        return choice; 
+    } catch (error) {
+        console.log(error);
+    }   
+}
+
+// Function to give employees a manager
+const updateEmployeeManagers = (x) => {
+    let depID;
+    let empID;
+    let manID;
+    let nameArray = x.employee.split(" ");
+    let firstName = nameArray[0];
+    let lastName = nameArray[1];
+    db.query('SELECT employee.id ,employee.first_name, employee.last_name, employee.manager_id, role.department_id FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id WHERE employee.first_name = ? AND employee.last_name = ?;', [firstName, lastName], (err, data) => {
+        depID = data[0].department_id;
+        empID = data[0].id;
+        db.query('SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id WHERE department.id = ?;', [depID], (err, data) => {
+            if (data.length > 1) {
+                for (let i = 0; i < data.length; i++) {
+                    if (empID !== data[i].manager_id) {
+                        if (data[i].manager_id !== null) {
+                            manID = data[i].manager_id;
+                            break;
+                        } else if (data[i].id !== empID) {
+                            manID = data[i].id;
+                            break;
+                        }
+                    }
+                }
+                db.query('UPDATE employee SET manager_id = ? WHERE first_name = ? AND last_name = ?;', [manID, firstName, lastName], (err, data) => {
+                    return console.log("Successfully updated employee!");
+                })
+            } else {
+                return console.log("Must have more than one employee to have a manager.");
+            }
+            
+        })
+    })
+    
+}
+
 // Switch case to handle answer from main menu
 const SwitchCase = async (c) => {
     try {
@@ -304,6 +357,11 @@ const SwitchCase = async (c) => {
             case 'UPDATE EMPLOYEE ROLE':
                 const f = await updateEmployeeRolePrompt();
                 updateEmployeeRole(f);
+                break;
+
+            case 'UPDATE EMPLOYEE MANAGERS':
+                const g = await updateEmployeeManagersPrompt();
+                updateEmployeeManagers(g);
                 break;
     
             case 'QUIT':
